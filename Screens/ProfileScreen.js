@@ -65,16 +65,17 @@ export default function ProfileScreen() {
             tx.executeSql('SELECT * FROM sports WHERE isPracticed = 1', [], (_, {rows}) => {
                 let s1 = rows._array[0];
                 let s2 = rows._array[1];
-                if(s1){
+                if (s1) {
+                    console.log(s1);
                     setSport1(s1.name);
                     setTimesAWeek1(s1.timesAWeek);
-                } else{
+                } else {
                     setSport1("None");
                 }
-                if(s2){
+                if (s2) {
                     setSport2(s2.name);
                     setTimesAWeek2(s2.timesAWeek);
-                } else{
+                } else {
                     setSport2("None");
                 }
 
@@ -87,6 +88,13 @@ export default function ProfileScreen() {
 
     function updateSports() {
         db.transaction(tx => {
+            tx.executeSql('UPDATE sports SET isPracticed = 0 ;');
+        }, error => {
+            console.log(error.message);
+            Alert.alert("Error " + error.code);
+        }, null);
+
+        db.transaction(tx => {
             tx.executeSql('UPDATE sports SET isPracticed = 1 WHERE name=? OR name=?;',
                 [sport1, sport2]);
         }, error => {
@@ -95,14 +103,20 @@ export default function ProfileScreen() {
         }, null);
 
         db.transaction(tx => {
-            tx.executeSql('UPDATE sports SET isPracticed = 0 WHERE NOT name=? OR NOT name=?;',
-                [sport1, sport2]);
+            tx.executeSql('UPDATE sports SET timesAWeek = ? WHERE name=?;',
+                [timesAWeek1, sport1]);
         }, error => {
             console.log(error.message);
             Alert.alert("Error " + error.code);
         }, null);
 
-
+        db.transaction(tx => {
+            tx.executeSql('UPDATE sports SET timesAWeek = ? WHERE name=?;',
+                [timesAWeek2, sport2]);
+        }, error => {
+            console.log(error.message);
+            Alert.alert("Error " + error.code);
+        }, null);
     }
 
     function saveProfile() {

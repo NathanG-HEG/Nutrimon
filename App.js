@@ -15,7 +15,7 @@ export default function App() {
     let initialRouteName = "Input";
 
     useEffect(() => {
-        checkFirstLaunch()
+        checkFirstLaunch();
     }, []);
 
     /**
@@ -98,7 +98,7 @@ export default function App() {
         ];
         sports.forEach(sport => {
             db.transaction(tx => {
-                    tx.executeSql('INSERT INTO sports VALUES (?, ?, ?, ?)', [sport.index, sport.name, sport.kcalories, 0]);
+                    tx.executeSql('INSERT INTO sports VALUES (?, ?, ?, ?, ?)', [sport.index, sport.name, sport.kcalories, 0, 0]);
                 },
                 error => {
                     console.log(error.message);
