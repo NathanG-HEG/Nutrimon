@@ -25,6 +25,8 @@ export default function ProfileScreen() {
     const [sport2, setSport2] = useState('None');
     const [timesAWeek2, setTimesAWeek2] = useState('');
     const [userExist, setUserExist] = useState(false);
+    const [sport1Kcal, setSport1Kcal] = useState(0);
+    const [sport2Kcal, setSport2Kcal] = useState(0);
 
     useEffect(() => {
         //Select user data
@@ -66,15 +68,16 @@ export default function ProfileScreen() {
                 let s1 = rows._array[0];
                 let s2 = rows._array[1];
                 if (s1) {
-                    console.log(s1);
                     setSport1(s1.name);
                     setTimesAWeek1(s1.timesAWeek);
+                    setSport1Kcal(s1.kcalories)
                 } else {
                     setSport1("None");
                 }
                 if (s2) {
                     setSport2(s2.name);
                     setTimesAWeek2(s2.timesAWeek);
+                    setSport2Kcal(s2.kcalories)
                 } else {
                     setSport2("None");
                 }
@@ -126,12 +129,27 @@ export default function ProfileScreen() {
 
         console.log("Saving profile...");
         console.log("Does user exist? " + userExist)
+
+        function calculateNeededKcal() {
+            let isMale = gender === genders[0].label;
+            // d = delta, bwf = body weight factor, bhf = body height factor, ad = age factor
+            let d = isMale ? 66.5 : 655.1;
+            let bwf = isMale ? 13.8 : 9.6;
+            let bhf = isMale ? 5 : 1.9;
+            let af = isMale ? 6.8 : 4.7;
+            let ans = weight * bwf + height * bhf - 30 * af + d;
+            ans = ans + sport1Kcal*timesAWeek1/5 + sport2Kcal*timesAWeek2/5;
+            console.log("Calculated needed kcal: " + ans);
+            return ans;
+        }
+
+        let neededKcal = calculateNeededKcal();
         if (userExist) {
             console.log("Updating profile...");
             console.log("Updating " + name + " " + gender + " " + weight + " " + height);
             db.transaction(tx => {
-                tx.executeSql('UPDATE user SET name = ?, gender = ?, weight = ?, height = ? WHERE 1=1;',
-                    [name, gender, weight, height]);
+                tx.executeSql('UPDATE user SET name = ?, gender = ?, weight = ?, height = ?, kcalories = ? WHERE 1=1;',
+                    [name, gender, weight, height, neededKcal]);
             }, error => {
                 console.log(error.message);
                 Alert.alert("Error " + error.code);
@@ -143,8 +161,8 @@ export default function ProfileScreen() {
             console.log("Creating profile...");
             console.log("Inserting " + name + " " + gender + " " + weight + " " + height);
             db.transaction(tx => {
-                tx.executeSql('INSERT INTO user (name, gender, weight, height) VALUES (?,?,?,?);',
-                    [name, gender, weight, height]);
+                tx.executeSql('INSERT INTO user (name, gender, weight, height, kcalories) VALUES (?,?,?,?,?);',
+                    [name, gender, weight, height, neededKcal]);
             }, error => {
                 console.log(error.message);
                 Alert.alert("Error " + error.code);
@@ -280,11 +298,25 @@ export default function ProfileScreen() {
                 </View>
 
             </View>
-            <View style={{width: windowWidth, alignItems: 'center', position: 'absolute', bottom: 11}}>
+            <View style={{
+                width: windowWidth,
+                alignItems: 'center',
+                position: 'absolute',
+                left: windowWidth*0.3,
+                marginLeft: 42,
+                flexDirection: 'column',
+
+            }}>
                 <Button
                     disabled={name === '' || weight === '' || height === ''}
                     title='Save profile'
                     onPress={saveProfile}
+                    icon={{
+                        name: "save",
+                        size: 45,
+                        color: 'rgb(137,158,255)',
+                    }}
+                    buttonStyle={{backgroundColor: null}}
                 />
             </View>
         </View>

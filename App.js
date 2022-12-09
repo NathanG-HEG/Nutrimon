@@ -8,6 +8,7 @@ import ProfileScreen from "./Screens/ProfileScreen";
 import * as SQLite from 'expo-sqlite';
 import {Alert} from "react-native";
 import {useEffect} from "react";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function App() {
     const Tab = createBottomTabNavigator();
@@ -106,15 +107,24 @@ export default function App() {
                 }, () => console.log("Added sport" + sport.name))
         });
     }
+    const iconColor = 'rgb(137,158,255)'
 
     return (
         <NavigationContainer>
-            <Tab.Navigator initialRouteName={initialRouteName}>
-                <Tab.Screen name="Statistics" component={StatisticsScreen}/>
-                <Tab.Screen name="Dashboard" component={DashboardScreen}/>
-                <Tab.Screen name="Input" component={InputScreen}/>
-                <Tab.Screen name="Settings" component={SettingsScreen}/>
-                <Tab.Screen name="Profile" component={ProfileScreen} options={{title: "Set up your profile"}}/>
+            <Tab.Navigator
+                initialRouteName={initialRouteName}
+                tabBarActiveTintColor='rgb(180,195,255)'
+            >
+                <Tab.Screen name="Statistics" component={StatisticsScreen}
+                            options={{tabBarIcon: () => (<Icon name='line-chart' size={18} color={iconColor}/>)}}/>
+                <Tab.Screen name="Dashboard" component={DashboardScreen}
+                            options={{tabBarIcon: () => (<Icon name='bar-chart' size={18} color={iconColor}/>)}}/>
+                <Tab.Screen name="Input" component={InputScreen}
+                            options={{tabBarIcon: () => (<Icon name='plus-square' size={18} color={iconColor}/>)}}/>
+                <Tab.Screen name="Settings" component={SettingsScreen}
+                            options={{tabBarIcon: () => (<Icon name='gears' size={18} color={iconColor}/>)}}/>
+                <Tab.Screen name="Profile" component={ProfileScreen}
+                            options={{title: "Set up", tabBarIcon: () => (<Icon name='user-circle' size={18} color={iconColor}/>)}}/>
             </Tab.Navigator>
         </NavigationContainer>
     );

@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from "react";
 
-import {Alert, Dimensions, StyleSheet, Text, View} from "react-native";
+import {Alert, Dimensions, Pressable, StyleSheet, Text, View} from "react-native";
 import {Button, Input} from "react-native-elements";
 import {Picker} from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {clear} from "react-native/Libraries/LogBox/Data/LogBoxData";
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -12,25 +13,28 @@ const windowHeight = Dimensions.get('window').height;
 const apiKey = 'X8SKes6FOl8RiiZL2BfEYg==Z9D4Kd1gZ7aLQb68';
 
 const DEBUG_MODE = false;
+let storedDate;
+let storedKcal = 0;
+let storedCarbs = 0;
+let storedProteins = 0;
+let storedFats = 0;
+let storedSugar = 0;
+let storedSatFats = 0;
+let storedSodium = 0;
 
 export default function InputScreen({navigation}) {
 
+    let today = new Date().toISOString();
+
+
     useEffect(() => {
         return navigation.addListener('focus', () => {
+            today = new Date().toISOString();
             loadNutriments();
             updateDay();
         })
     }, [navigation]);
 
-    let today = new Date().toISOString();
-    let storedDate;
-    let storedKcal = 0;
-    let storedCarbs = 0;
-    let storedProteins = 0;
-    let storedFats = 0;
-    let storedSugar = 0;
-    let storedSatFats = 0;
-    let storedSodium = 0;
 
     const units = [
         {k: 0, label: 'g', factor: 1},
@@ -97,7 +101,7 @@ export default function InputScreen({navigation}) {
 
     async function updateDay() {
         storedDate = await AsyncStorage.getItem("TODAY");
-        if (storedDate === undefined || storedDate === null || storedDate!== today) {
+        if (storedDate === undefined || storedDate === null || storedDate !== today) {
             storedDate = today;
         }
         console.log("updateDay(): storedDate: " + storedDate);
@@ -132,14 +136,14 @@ export default function InputScreen({navigation}) {
 
         async function saveNutriments() {
             console.log("Saving Nutriments...");
-            await AsyncStorage.setItem('KCAL', storedKcal.toString());
+            await AsyncStorage.setItem('KCAL', storedKcal.toFixed(2).toString());
             console.log("saving " + storedKcal)
-            await AsyncStorage.setItem('CARB', storedCarbs.toString());
-            await AsyncStorage.setItem('PROT', storedProteins.toString());
-            await AsyncStorage.setItem('FAT', storedFats.toString());
-            await AsyncStorage.setItem('SUG', storedSugar.toString());
-            await AsyncStorage.setItem('SAT', storedSatFats.toString());
-            await AsyncStorage.setItem('SOD', storedSodium.toString());
+            await AsyncStorage.setItem('CARB', storedCarbs.toFixed(2).toString());
+            await AsyncStorage.setItem('PROT', storedProteins.toFixed(2).toString());
+            await AsyncStorage.setItem('FAT', storedFats.toFixed(2).toString());
+            await AsyncStorage.setItem('SUG', storedSugar.toFixed(2).toString());
+            await AsyncStorage.setItem('SAT', storedSatFats.toFixed(2).toString());
+            await AsyncStorage.setItem('SOD', storedSodium.toFixed(2).toString());
             console.log("Nutriments Saved!");
         }
 
@@ -147,7 +151,7 @@ export default function InputScreen({navigation}) {
             try {
                 console.log(storedKcal + " stored Kcal before");
                 storedKcal += parseFloat(food.calories);
-                storedCarbs += parseFloat(food.carbohydrate_total_g);
+                storedCarbs += parseFloat(food.carbohydrates_total_g);
                 storedProteins += parseFloat(food.protein_g);
                 storedFats += parseFloat(food.fat_total_g);
                 storedSugar += parseFloat(food.sugar_g);
@@ -162,26 +166,35 @@ export default function InputScreen({navigation}) {
         }
 
         console.log("Adding food...");
-        if (storedDate !== today || DEBUG_MODE) {
-            console.log("Updating today's date (storedDate: " + storedDate + " today: " + today);
-            console.log("Removing old nutriments...");
-            storedKcal = 0;
-            storedCarbs = 0;
-            storedProteins = 0;
-            storedFats = 0;
-            storedSugar = 0;
-            storedSatFats = 0;
-            storedSodium = 0;
-
-            console.log("Updated the date!");
-            saveNutriments().then(() => {
-                console.log("Removed old nutriments!")
-                storeNutriments();
-            });
-
+        if (storedDate === undefined) {
+            updateDay().then(callStoreNutriments);
         } else {
-            console.log("Date is not updated");
-            storeNutriments();
+            callStoreNutriments();
+        }
+
+
+        function callStoreNutriments() {
+            if (storedDate.substring(0, 10) !== today.substring(0, 10) || DEBUG_MODE) {
+                console.log("Updating today's date (storedDate: " + storedDate.substring(0, 10) + " today: " + today.substring(0, 10));
+                console.log("Removing old nutriments...");
+                storedKcal = 0;
+                storedCarbs = 0;
+                storedProteins = 0;
+                storedFats = 0;
+                storedSugar = 0;
+                storedSatFats = 0;
+                storedSodium = 0;
+
+                console.log("Updated the date!");
+                saveNutriments().then(() => {
+                    console.log("Removed old nutriments!")
+                    storeNutriments();
+                });
+
+            } else {
+                console.log("Date is not updated");
+                storeNutriments();
+            }
         }
     }
 
@@ -232,11 +245,12 @@ export default function InputScreen({navigation}) {
                     </Picker>
 
                 </View>
-                <Button
+                <Pressable
+                    style={{backgroundColor: 'rgb(137,158,255)', width: windowWidth * 0.25}}
                     onPress={addInput}
-                    title='Add'
-                    buttonStyle={{width: windowWidth * 0.25}}
-                />
+                >
+                    <Text style={{marginTop: 15, marginLeft: 30, fontWeight: 'bold', fontSize: 18, color: 'white'}}>Add</Text>
+                </Pressable>
             </View>
 
             <View style={{paddingLeft: 11}}>
