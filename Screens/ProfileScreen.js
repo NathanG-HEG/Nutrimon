@@ -6,8 +6,7 @@ import * as SQLite from "expo-sqlite";
 import {Button} from 'react-native-elements';
 
 const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
-
+Dimensions.get('window').height;
 export default function ProfileScreen() {
 
     const genders = [{k: 0, label: "Male"}, {k: 1, label: "Female"}, {k: 2, label: "Do not specify/Other"}];

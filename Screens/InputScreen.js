@@ -4,12 +4,10 @@ import {Alert, Dimensions, Pressable, StyleSheet, Text, View} from "react-native
 import {Button, Input} from "react-native-elements";
 import {Picker} from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {clear} from "react-native/Libraries/LogBox/Data/LogBoxData";
 
 
 const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
-
+Dimensions.get('window').height;
 const apiKey = 'X8SKes6FOl8RiiZL2BfEYg==Z9D4Kd1gZ7aLQb68';
 
 const DEBUG_MODE = false;

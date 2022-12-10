@@ -1,6 +1,5 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import StatisticsScreen from "./Screens/StatisticsScreen";
 import SettingsScreen from "./Screens/SettingsScreen";
 import DashboardScreen from "./Screens/DashboardScreen";
 import InputScreen from "./Screens/InputScreen";
@@ -115,8 +114,6 @@ export default function App() {
                 initialRouteName={initialRouteName}
                 tabBarActiveTintColor='rgb(180,195,255)'
             >
-                <Tab.Screen name="Statistics" component={StatisticsScreen}
-                            options={{tabBarIcon: () => (<Icon name='line-chart' size={18} color={iconColor}/>)}}/>
                 <Tab.Screen name="Dashboard" component={DashboardScreen}
                             options={{tabBarIcon: () => (<Icon name='bar-chart' size={18} color={iconColor}/>)}}/>
                 <Tab.Screen name="Input" component={InputScreen}

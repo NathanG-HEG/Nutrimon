@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {Alert, Pressable, StyleSheet, Text, ToastAndroid, View} from "react-native";
+import {Alert, Pressable, StyleSheet, Text, View} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SQLite from "expo-sqlite";
 import {ProgressChart, StackedBarChart} from "react-native-chart-kit";
@@ -18,10 +18,7 @@ export default function DashboardScreen({navigation}) {
     }, [navigation]);
 
     const db = SQLite.openDatabase('nutrimon.db');
-
-    let color = 'rgb(180, 195, 255)';
-    let today = new Date().toISOString();
-    let storedDate;
+    new Date().toISOString();
     const [neededKcal, setNeededKcal] = useState(0);
     const [storedKcal, setStoredKcal] = useState(0);
     const [storedCarbs, setStoredCarbs] = useState(0);
