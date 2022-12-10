@@ -13,17 +13,25 @@ export default function SettingsScreen() {
     }
 
     return (
-        <View>
+        <View style={{
+            flex: 1,
+            backgroundColor: '#fff',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            paddingTop: 11,
+            paddingBottom: 11,
+        }}>
             <Button
                 icon={<Icon
                     name='info-circle'
                     size={22}
                     color='rgb(137,158,255)'/>
                 }
-                title='  About'
+                title='  About Nutrimon'
                 buttonStyle={{
-                    backgroundColor: 'rgb(189,189,189)',
-                    borderWidth: 0.5,
+                    width: 400,
+                    backgroundColor: 'rgb(194,194,194)',
+                    borderWidth: 0.8,
                     borderColor: 'rgb(137,158,255)',
                     borderRadius: 0
                 }}
@@ -41,7 +49,7 @@ export default function SettingsScreen() {
                     alignSelf: 'center',
                     fontWeight: 'bold'
                 }}>
-                    About title
+                    About Nutrimon
                 </Text>
                 <Text>
                     Nutrimon is a nutrition app that aims to help people manage their food intake.
