@@ -29,7 +29,6 @@ export default function InputScreen({navigation}) {
         return navigation.addListener('focus', () => {
             today = new Date().toISOString();
             loadNutriments();
-            updateDay();
         })
     }, [navigation]);
 
