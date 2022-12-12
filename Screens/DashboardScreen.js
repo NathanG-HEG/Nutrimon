@@ -6,14 +6,13 @@ import * as SQLite from "expo-sqlite";
 import {ProgressChart, StackedBarChart} from "react-native-chart-kit";
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-
 export default function DashboardScreen({navigation}) {
 
     useEffect(() => {
         return navigation.addListener('focus', () => {
             loadNutriments();
             loadNeededKcal();
-            console.log(calculateMacroRatio());
+            loadStoredDate();
         });
     }, [navigation]);
 
@@ -27,6 +26,17 @@ export default function DashboardScreen({navigation}) {
     const [storedSugar, setStoredSugar] = useState(0);
     const [storedSatFats, setStoredSatFats] = useState(0);
     const [storedSodium, setStoredSodium] = useState(0);
+    const [storedDate, setStoredDate] = useState("");
+
+    async function loadStoredDate() {
+        let date = await AsyncStorage.getItem("TODAY");
+        setStoredDate(date);
+        if (storedDate === "" || storedDate === undefined) {
+            setStoredDate(new Date().toISOString());
+            console.log("storedDate could not be loaded");
+        }
+        console.log("Loaded storedDate: " + storedDate);
+    }
 
     const loadNutriments = async () => {
         console.log("Loading nutriments");
@@ -91,21 +101,28 @@ export default function DashboardScreen({navigation}) {
 
     return (
         <View style={styles.container}>
-            <ProgressChart
-                data={calcKcalRatio()}
-                width={400}
-                height={400}
-                strokeWidth={50}
-                radius={150}
-                chartConfig={{
-                    marginTop: -200,
-                    color: (opacity = 1) => `rgba(180, 195, 255, ${opacity})`,
-                    useShadowColorFromDataset: false,
-                    backgroundGradientFrom: '#ffffff',
-                    backgroundGradientTo: '#ffffff',
-                }}
-                hideLegend={true}
-            />
+            <Text style={{
+                color: 'grey',
+                fontSize: 10,
+                elevation: 3
+            }}>Last updated on the {storedDate.substring(0, 10)}</Text>
+            <View style={{marginTop:-20}}>
+                <ProgressChart
+                    data={calcKcalRatio()}
+                    width={400}
+                    height={400}
+                    strokeWidth={50}
+                    radius={150}
+                    chartConfig={{
+                        marginTop: -400,
+                        color: (opacity = 1) => `rgba(180, 195, 255, ${opacity})`,
+                        useShadowColorFromDataset: false,
+                        backgroundGradientFrom: '#ffffff',
+                        backgroundGradientTo: '#ffffff',
+                    }}
+                    hideLegend={true}
+                />
+            </View>
             <Text style={{
                 color: 'black',
                 marginTop: -210,

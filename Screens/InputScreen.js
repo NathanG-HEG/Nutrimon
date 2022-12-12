@@ -28,6 +28,7 @@ export default function InputScreen({navigation}) {
     useEffect(() => {
         return navigation.addListener('focus', () => {
             today = new Date().toISOString();
+            loadStoredDate();
             loadNutriments();
         })
     }, [navigation]);
@@ -46,6 +47,12 @@ export default function InputScreen({navigation}) {
 
     async function clearAsyncStorage() {
         await AsyncStorage.clear();
+    }
+
+    async function loadStoredDate() {
+        storedDate = await AsyncStorage.getItem("TODAY");
+        if (storedDate === null)  await updateDay();
+        console.log("Loaded storedDate: "+storedDate);
     }
 
 
@@ -97,10 +104,8 @@ export default function InputScreen({navigation}) {
     }
 
     async function updateDay() {
-        storedDate = await AsyncStorage.getItem("TODAY");
-        if (storedDate === undefined || storedDate === null || storedDate !== today) {
-            storedDate = today;
-        }
+        storedDate = today;
+        await AsyncStorage.setItem('TODAY', storedDate);
         console.log("updateDay(): storedDate: " + storedDate);
     }
 
@@ -163,30 +168,30 @@ export default function InputScreen({navigation}) {
         }
 
         console.log("Adding food...");
-        if (storedDate === undefined) {
-            updateDay().then(callStoreNutriments);
-        } else {
-            callStoreNutriments();
-        }
+        callStoreNutriments();
 
 
         function callStoreNutriments() {
-            if (storedDate.substring(0, 10) !== today.substring(0, 10) || DEBUG_MODE) {
-                console.log("Updating today's date (storedDate: " + storedDate.substring(0, 10) + " today: " + today.substring(0, 10));
-                console.log("Removing old nutriments...");
-                storedKcal = 0;
-                storedCarbs = 0;
-                storedProteins = 0;
-                storedFats = 0;
-                storedSugar = 0;
-                storedSatFats = 0;
-                storedSodium = 0;
+            console.log("callStoreNutriments(): storedDate: " + storedDate);
+            if (storedDate === undefined || storedDate.substring(0, 10) !== today.substring(0, 10) || DEBUG_MODE) {
+                updateDay().then(() => {
+                    console.log("Updating today's date (storedDate: " + storedDate.substring(0, 10) + " today: " + today.substring(0, 10));
+                    console.log("Removing old nutriments...");
+                    storedKcal = 0;
+                    storedCarbs = 0;
+                    storedProteins = 0;
+                    storedFats = 0;
+                    storedSugar = 0;
+                    storedSatFats = 0;
+                    storedSodium = 0;
 
-                console.log("Updated the date!");
-                saveNutriments().then(() => {
-                    console.log("Removed old nutriments!")
-                    storeNutriments();
+                    console.log("Updated the date!");
+                    saveNutriments().then(() => {
+                        console.log("Removed old nutriments!")
+                        storeNutriments();
+                    });
                 });
+
 
             } else {
                 console.log("Date is not updated");
@@ -246,7 +251,13 @@ export default function InputScreen({navigation}) {
                     style={{backgroundColor: 'rgb(137,158,255)', width: windowWidth * 0.25}}
                     onPress={addInput}
                 >
-                    <Text style={{marginTop: 15, marginLeft: 30, fontWeight: 'bold', fontSize: 18, color: 'white'}}>Add</Text>
+                    <Text style={{
+                        marginTop: 15,
+                        marginLeft: 30,
+                        fontWeight: 'bold',
+                        fontSize: 18,
+                        color: 'white'
+                    }}>Add</Text>
                 </Pressable>
             </View>
 
